@@ -1,0 +1,9 @@
+{
+    "private": true,
+    "name": "sortable",
+    "version": "1.0.0",
+    "main": "resources/js/sortable.js",
+    "dependencies": {
+        "sortablejs": "^1.15.0"
+    }
+}
