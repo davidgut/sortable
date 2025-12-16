@@ -47,20 +47,15 @@ composer require davidgut/sortable
 
 ## Frontend Usage
 
-This package includes a 0-config wrapper for [SortableJS](https://sortablejs.github.io/Sortable/).
+This package includes a lightweight, native JavaScript drag-and-drop implementation. No external dependencies are required.
 
-1. **Install SortableJS.**
-   ```bash
-   npm install sortablejs
-   ```
-
-2. **Publish the assets.**
+1. **Publish the assets.**
    This copies the JS wrapper to your resources folder.
    ```bash
    php artisan vendor:publish --tag=sortable-assets
    ```
 
-3. **Import and Start.**
+2. **Import and Start.**
    In your `app.js`:
 
    ```javascript
@@ -69,7 +64,7 @@ This package includes a 0-config wrapper for [SortableJS](https://sortablejs.git
    SortableList.start();
    ```
 
-4. **Add `data-sortable` to your list.**
+3. **Add `data-sortable` to your list.**
    The library will automatically find lists with this attribute.
    
    - `data-sortable`: Marks the container.

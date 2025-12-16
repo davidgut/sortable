@@ -3,3 +3,4 @@
 .DS_Store
 composer.lock
 phpunit.xml
+playground.html
