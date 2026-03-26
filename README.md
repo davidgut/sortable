@@ -1,117 +1,152 @@
 # Laravel Sortable
 
-Simple drag-and-drop sorting for your Laravel models.
+Drag-and-drop sorting for your Eloquent models — backend and frontend included.  
+No dependencies, no build step required for the JS, just install and go.
 
-## Installation
+Supports Laravel 11, 12 & 13.
+
+## Quick Start
 
 ```bash
 composer require davidgut/sortable
 ```
 
-## Setup
+Add a `position` column to any table you want to sort:
 
-1. **Add the column to your table.**
-   By default, the package looks for a `position` column.
-
-   ```php
-   Schema::create('posts', function (Blueprint $table) {
-       // ...
-       $table->integer('position')->nullable();
-   });
-   ```
-
-2. **Implement the Contract and Trait in your Model.**
-
-   ```php
-   use DavidGut\Sortable\Contracts\Sortable;
-   use DavidGut\Sortable\Traits\HasPosition;
-
-   class Post extends Model implements Sortable
-   {
-       use HasPosition;
-
-       // Optional configuration
-       // protected $positionColumn = 'custom_order';
-       // protected ?string $positionScope = 'category_id'; // Sorts uniquely per category
-   }
-   ```
-
-3. **Register your models in the config.**
-   Publish the config file:
-
-   ```bash
-   php artisan vendor:publish --tag=sortable-config
-   ```
-
-   Then map your models in `config/sortable.php`:
-
-   ```php
-   'models' => [
-       'posts' => \App\Models\Post::class,
-   ],
-   ```
-
-   > **Note:** In non-production environments, the package will also try to resolve `App\Models\{name}` automatically so you can get started without config. In production, only explicitly registered models are allowed.
-
-The package automatically registers a `PUT /sortable/{model}/{id}` route named `sortable.update` with `web` middleware. To customise it, publish the route file:
-
-   ```bash
-   php artisan vendor:publish --tag=sortable-routes
-   ```
-
-## Frontend Usage
-
-This package includes a lightweight, native JavaScript drag-and-drop implementation. No external dependencies required.
-
-1. **Publish the assets.**
-   ```bash
-   php artisan vendor:publish --tag=sortable-assets
-   ```
-
-2. **Import and Start.**
-   In your `app.js`:
-
-   ```javascript
-   import SortableList from './vendor/sortable/sortable';
-
-   SortableList.start();
-   ```
-
-3. **Add `data-sortable` to your list.**
-   The library will automatically find lists with this attribute.
-   
-   - `data-sortable`: Marks the container.
-   - `data-sortable-update-url`: The endpoint to hit when dropped.
-   - `data-sortable-handle`: (Optional) CSS selector for the drag handle. Defaults to `.drag`.
-
-   ```html
-   <ul data-sortable>
-       @foreach($posts as $post)
-           <li data-sortable-update-url="{{ route('sortable.update', ['model' => 'posts', 'id' => $post->id]) }}">
-               <span class="drag">:::</span>
-               {{ $post->title }}
-           </li>
-       @endforeach
-   </ul>
-   ```
-
-   > **Note:** Ensure you have the `<meta name="csrf-token">` tag in your layout head so requests don't fail.
-
-### SPA / Livewire Support
-
-`SortableList.start()` returns the created instances, and `SortableList.stop()` tears them down:
-
-```javascript
-// Initialize
-const instances = SortableList.start();
-
-// Teardown (e.g. on page navigation)
-SortableList.stop();
+```php
+$table->integer('position')->nullable();
 ```
 
-## Security
+Then implement the contract on your model:
 
-By default, only users where `$user->isAdmin()` returns true can resort items. You can override this in your model:
+```php
+use DavidGut\Sortable\Contracts\Sortable;
+use DavidGut\Sortable\Traits\HasPosition;
+
+class Post extends Model implements Sortable
+{
+    use HasPosition;
+}
+```
+
+That's it for the backend. New records automatically get the next position, and the package registers a `PUT /sortable/{model}/{id}` route for you.
+
+### Frontend
+
+Publish the included JavaScript:
+
+```bash
+php artisan vendor:publish --tag=sortable-assets
+```
+
+Import it in your `app.js`:
+
+```javascript
+import SortableList from './vendor/sortable/sortable';
+
+SortableList.start();
+```
+
+Mark up your list:
+
+```html
+<ul data-sortable>
+    @foreach($posts as $post)
+        <li data-sortable-update-url="{{ route('sortable.update', ['model' => 'posts', 'id' => $post->id]) }}">
+            <span class="drag">:::</span>
+            {{ $post->title }}
+        </li>
+    @endforeach
+</ul>
+```
+
+Make sure you have a `<meta name="csrf-token">` tag in your layout — the JS reads it for requests.
+
+Done. Your list is now sortable.
+
+---
+
+## Configuration
+
+### Registering Models
+
+Publish the config:
+
+```bash
+php artisan vendor:publish --tag=sortable-config
+```
+
+Map your models in `config/sortable.php`:
+
+```php
+'models' => [
+    'posts' => \App\Models\Post::class,
+],
+```
+
+> In non-production environments the package will also try to resolve `App\Models\{Name}` automatically, so you can skip this step during development. In production, only explicitly registered models are allowed.
+
+### Custom Position Column
+
+The default column is `position`. To change it, set the property on your model:
+
+```php
+class Post extends Model implements Sortable
+{
+    use HasPosition;
+
+    protected $positionColumn = 'sort_order';
+}
+```
+
+### Scoped Sorting
+
+Need separate sort orders per group? For example, sorting posts within each category independently:
+
+```php
+class Post extends Model implements Sortable
+{
+    use HasPosition;
+
+    protected ?string $positionScope = 'category_id';
+}
+```
+
+Each `category_id` will now have its own position sequence starting from 0.
+
+### Custom Position Queries
+
+For more advanced cases, override `getPositionQuery()`:
+
+```php
+protected function getPositionQuery(): Builder
+{
+    return parent::getPositionQuery()->where('is_active', true);
+}
+```
+
+### Custom Routes
+
+The package auto-registers routes with `web` middleware. If you need to customise them:
+
+```bash
+php artisan vendor:publish --tag=sortable-routes
+```
+
+### Query Scope
+
+Retrieve records in sorted order:
+
+```php
+Post::sorted()->get();
+Post::sorted('desc')->get();
+```
+
+---
+
+## Authorization
+
+By default, only users where `$user->isAdmin()` returns `true` can re-sort items. Override this per model:
 
 ```php
 public function canBeSortedBy($user): bool
@@ -119,3 +154,22 @@ public function canBeSortedBy($user): bool
     return $user->id === $this->user_id;
 }
 ```
+
+---
+
+## SPA / Livewire
+
+`SortableList.start()` returns the created instances. Call `SortableList.stop()` to tear them down on navigation:
+
+```javascript
+const instances = SortableList.start();
+
+// Later, on page leave:
+SortableList.stop();
+```
+
+---
+
+## License
+
+MIT
