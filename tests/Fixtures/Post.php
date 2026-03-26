@@ -3,12 +3,12 @@
 namespace DavidGut\Sortable\Tests\Fixtures;
 
 use DavidGut\Sortable\Contracts\Sortable;
-use DavidGut\Sortable\Traits\HasPosition;
+use DavidGut\Sortable\Traits\SortableTrait;
 use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model implements Sortable
 {
-    use HasPosition;
+    use SortableTrait;
 
     protected $guarded = [];
 

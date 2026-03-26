@@ -7,9 +7,9 @@ it('sets order automatically on creation', function () {
     $post2 = Post::create(['title' => 'Post 2']);
     $post3 = Post::create(['title' => 'Post 3']);
 
-    expect($post1->position)->toBe(0);
-    expect($post2->position)->toBe(1);
-    expect($post3->position)->toBe(2);
+    expect($post1->sort_order)->toBe(0);
+    expect($post2->sort_order)->toBe(1);
+    expect($post3->sort_order)->toBe(2);
 });
 
 it('can move a model down', function () {
@@ -17,11 +17,11 @@ it('can move a model down', function () {
     $post2 = Post::create(['title' => 'Post 2']); // 1
     $post3 = Post::create(['title' => 'Post 3']); // 2
 
-    $post1->setPosition(2);
+    $post1->moveTo(2);
 
-    expect($post1->fresh()->position)->toBe(2);
-    expect($post2->fresh()->position)->toBe(0);
-    expect($post3->fresh()->position)->toBe(1);
+    expect($post1->fresh()->sort_order)->toBe(2);
+    expect($post2->fresh()->sort_order)->toBe(0);
+    expect($post3->fresh()->sort_order)->toBe(1);
 });
 
 it('can move a model up', function () {
@@ -29,11 +29,11 @@ it('can move a model up', function () {
     $post2 = Post::create(['title' => 'Post 2']); // 1
     $post3 = Post::create(['title' => 'Post 3']); // 2
 
-    $post3->setPosition(0);
+    $post3->moveTo(0);
 
-    expect($post1->fresh()->position)->toBe(1);
-    expect($post2->fresh()->position)->toBe(2);
-    expect($post3->fresh()->position)->toBe(0);
+    expect($post1->fresh()->sort_order)->toBe(1);
+    expect($post2->fresh()->sort_order)->toBe(2);
+    expect($post3->fresh()->sort_order)->toBe(0);
 });
 
 it('can sort query', function () {

@@ -3,16 +3,16 @@
 namespace DavidGut\Sortable\Tests\Fixtures;
 
 use DavidGut\Sortable\Contracts\Sortable;
-use DavidGut\Sortable\Traits\HasPosition;
+use DavidGut\Sortable\Traits\SortableTrait;
 use Illuminate\Database\Eloquent\Model;
 
 class GroupedPost extends Model implements Sortable
 {
-    use HasPosition;
+    use SortableTrait;
 
     protected $guarded = [];
 
     protected $table = 'grouped_posts';
 
-    protected $positionScope = 'category_id';
+    protected $sortScope = 'category_id';
 }

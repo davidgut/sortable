@@ -12,12 +12,12 @@ use Illuminate\Support\Facades\Auth;
 class SortableController extends Controller
 {
     /**
-     * Handle the position update request for a given model instance.
+     * Handle the sort order update request for a given model instance.
      */
     public function __invoke(Request $request, string $model, $id): JsonResponse
     {
         $validated = $request->validate([
-            'position' => 'required|integer|min:0',
+            'sort_order' => 'required|integer|min:0',
         ]);
 
         $modelClass = $this->resolveModelClass($model);
@@ -36,9 +36,9 @@ class SortableController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $instance->setPosition($validated['position']);
+        $instance->moveTo($validated['sort_order']);
 
-        return response()->json(['message' => 'Position updated successfully']);
+        return response()->json(['message' => 'Sort order updated']);
     }
 
     /**

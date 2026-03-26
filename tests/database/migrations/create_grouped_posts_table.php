@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->string('title');
             $table->integer('category_id')->nullable();
-            $table->integer('position')->nullable();
+            $table->integer('sort_order')->nullable();
             $table->timestamps();
         });
     }

@@ -10,17 +10,17 @@ interface Sortable
     public function canBeSortedBy($user): bool;
 
     /**
-     * Move the model to a new position.
+     * Move the model to a new sort position.
      */
-    public function setPosition(int $newPosition): void;
+    public function moveTo(int $newPosition): void;
 
     /**
      * Get the name of the column used for sorting.
      */
-    public function getPositionColumn(): string;
+    public function getSortColumn(): string;
 
     /**
-     * Get the position scope column name if defined.
+     * Get the sort scope column name if defined.
      */
-    public function getPositionScopeColumn(): string|null;
+    public function getSortScopeColumn(): string|null;
 }

@@ -11,25 +11,25 @@ Supports Laravel 11, 12 & 13.
 composer require davidgut/sortable
 ```
 
-Add a `position` column to any table you want to sort:
+Add a `sort_order` column to any table you want to sort:
 
 ```php
-$table->integer('position')->nullable();
+$table->integer('sort_order')->nullable();
 ```
 
 Then implement the contract on your model:
 
 ```php
 use DavidGut\Sortable\Contracts\Sortable;
-use DavidGut\Sortable\Traits\HasPosition;
+use DavidGut\Sortable\Traits\SortableTrait;
 
 class Post extends Model implements Sortable
 {
-    use HasPosition;
+    use SortableTrait;
 }
 ```
 
-That's it for the backend. New records automatically get the next position, and the package registers a `PUT /sortable/{model}/{id}` route for you.
+That's it for the backend. New records automatically get the next sort order, and the package registers a `PUT /sortable/{model}/{id}` route for you.
 
 ### Frontend
 
@@ -90,16 +90,16 @@ Map your models in `config/sortable.php`:
 
 > In non-production environments the package will also try to resolve `App\Models\{Name}` automatically, so you can skip this step during development. In production, only explicitly registered models are allowed.
 
-### Custom Position Column
+### Custom Sort Column
 
-The default column is `position`. To change it, set the property on your model:
+The default column is `sort_order`. To change it, set the property on your model:
 
 ```php
 class Post extends Model implements Sortable
 {
-    use HasPosition;
+    use SortableTrait;
 
-    protected $positionColumn = 'sort_order';
+    protected $sortColumn = 'order';
 }
 ```
 
@@ -110,22 +110,22 @@ Need separate sort orders per group? For example, sorting posts within each cate
 ```php
 class Post extends Model implements Sortable
 {
-    use HasPosition;
+    use SortableTrait;
 
-    protected ?string $positionScope = 'category_id';
+    protected ?string $sortScope = 'category_id';
 }
 ```
 
-Each `category_id` will now have its own position sequence starting from 0.
+Each `category_id` will now have its own sort sequence starting from 0.
 
-### Custom Position Queries
+### Custom Sort Queries
 
-For more advanced cases, override `getPositionQuery()`:
+For more advanced cases, override `sortQuery()`:
 
 ```php
-protected function getPositionQuery(): Builder
+protected function sortQuery(): Builder
 {
-    return parent::getPositionQuery()->where('is_active', true);
+    return parent::sortQuery()->where('is_active', true);
 }
 ```
 

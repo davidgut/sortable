@@ -104,7 +104,7 @@ export default class SortableList {
 
         const form = new FormData();
         form.append("_method", "put");
-        form.append("position", newIndex);
+        form.append("sort_order", newIndex);
 
         const csrfToken = document.head.querySelector('meta[name="csrf-token"]')?.content;
 
@@ -118,11 +118,11 @@ export default class SortableList {
         })
             .then(response => {
                 if (!response.ok) {
-                    console.error('Position update failed:', response.statusText);
+                    console.error('Sort order update failed:', response.statusText);
                 }
             })
             .catch(error => {
-                console.error('Position update error:', error);
+                console.error('Sort order update error:', error);
             });
     }
 
