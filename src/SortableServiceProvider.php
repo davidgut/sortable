@@ -2,6 +2,7 @@
 
 namespace DavidGut\Sortable;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
 class SortableServiceProvider extends ServiceProvider
@@ -12,6 +13,10 @@ class SortableServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->loadRoutesFrom(__DIR__ . '/../routes/sortable.php');
+
+        Blade::directive('sortableUrl', function (string $expression) {
+            return "data-sortable-update-url=\"<?php echo e({$expression}->sortableUrl()); ?>\"";
+        });
 
         if ($this->app->runningInConsole()) {
             $this->publishes([

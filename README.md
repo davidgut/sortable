@@ -52,13 +52,17 @@ Mark up your list:
 ```html
 <ul data-sortable>
     @foreach($posts as $post)
-        <li data-sortable-update-url="{{ route('sortable.update', ['model' => 'posts', 'id' => $post->id]) }}">
+        <li @sortableUrl($post)>
             <span class="drag">:::</span>
             {{ $post->title }}
         </li>
     @endforeach
 </ul>
 ```
+
+> The `@sortableUrl` directive outputs the full `data-sortable-update-url="..."` attribute.  
+> You can also write it manually if you prefer: `data-sortable-update-url="{{ $post->sortableUrl() }}"`.
+
 
 Make sure you have a `<meta name="csrf-token">` tag in your layout — the JS reads it for requests.
 

@@ -150,6 +150,21 @@ trait HasPosition
     }
 
     /**
+     * Get the sortable update URL for this model instance.
+     */
+    public function sortableUrl(): string
+    {
+        $class = get_class($this);
+        $alias = array_search($class, config('sortable.models', []));
+
+        if ($alias === false) {
+            $alias = class_basename($class);
+        }
+
+        return route('sortable.update', ['model' => $alias, 'id' => $this->getKey()]);
+    }
+
+    /**
      * Scope the query to order by position.
      */
     public function scopeSorted(Builder $query, string $direction = 'asc'): Builder
