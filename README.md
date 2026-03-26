@@ -32,25 +32,38 @@ composer require davidgut/sortable
 
        // Optional configuration
        // protected $positionColumn = 'custom_order';
-       // protected $positionScope = 'category_id'; // Sorts uniquely per category
+       // protected ?string $positionScope = 'category_id'; // Sorts uniquely per category
    }
    ```
 
-3. **Add the API Route.**
-   Add the following to your `routes/web.php` or `routes/api.php` to handle updates.
+3. **Register your models in the config.**
+   Publish the config file:
+
+   ```bash
+   php artisan vendor:publish --tag=sortable-config
+   ```
+
+   Then map your models in `config/sortable.php`:
 
    ```php
-   use DavidGut\Sortable\Http\Controllers\PositionController;
+   'models' => [
+       'posts' => \App\Models\Post::class,
+   ],
+   ```
 
-   Route::put('/sortable/{model}/{id}', PositionController::class)->name('sortable.update');
+   > **Note:** In non-production environments, the package will also try to resolve `App\Models\{name}` automatically so you can get started without config. In production, only explicitly registered models are allowed.
+
+The package automatically registers a `PUT /sortable/{model}/{id}` route named `sortable.update` with `web` middleware. To customise it, publish the route file:
+
+   ```bash
+   php artisan vendor:publish --tag=sortable-routes
    ```
 
 ## Frontend Usage
 
-This package includes a lightweight, native JavaScript drag-and-drop implementation. No external dependencies are required.
+This package includes a lightweight, native JavaScript drag-and-drop implementation. No external dependencies required.
 
 1. **Publish the assets.**
-   This copies the JS wrapper to your resources folder.
    ```bash
    php artisan vendor:publish --tag=sortable-assets
    ```
@@ -69,12 +82,12 @@ This package includes a lightweight, native JavaScript drag-and-drop implementat
    
    - `data-sortable`: Marks the container.
    - `data-sortable-update-url`: The endpoint to hit when dropped.
-   - `.drag`: (Optional) Use this class on an element to make it the drag handle.
+   - `data-sortable-handle`: (Optional) CSS selector for the drag handle. Defaults to `.drag`.
 
    ```html
    <ul data-sortable>
        @foreach($posts as $post)
-           <li data-sortable-update-url="{{ route('sortable.update', ['model' => 'Post', 'id' => $post->id]) }}">
+           <li data-sortable-update-url="{{ route('sortable.update', ['model' => 'posts', 'id' => $post->id]) }}">
                <span class="drag">:::</span>
                {{ $post->title }}
            </li>
@@ -84,30 +97,24 @@ This package includes a lightweight, native JavaScript drag-and-drop implementat
 
    > **Note:** Ensure you have the `<meta name="csrf-token">` tag in your layout head so requests don't fail.
 
-## Configuration (Optional)
+### SPA / Livewire Support
 
-You can publish the config file to register model aliases (useful if you don't want to expose full class names in URLs).
+`SortableList.start()` returns the created instances, and `SortableList.stop()` tears them down:
 
-```bash
-php artisan vendor:publish --tag=sortable-config
+```javascript
+// Initialize
+const instances = SortableList.start();
+
+// Teardown (e.g. on page navigation)
+SortableList.stop();
 ```
-
-Then in `config/sortable.php`:
-
-```php
-'models' => [
-    'posts' => \App\Models\Post::class,
-],
-```
-
-Now your route can be `/sortable/posts/1` instead of `/sortable/Post/1`.
 
 ## Security
 
 By default, only users where `$user->isAdmin()` returns true can resort items. You can override this in your model:
 
 ```php
-public function canBePositionedBy($user): bool
+public function canBeSortedBy($user): bool
 {
     return $user->id === $this->user_id;
 }

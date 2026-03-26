@@ -6,9 +6,9 @@ return [
     | Sortable Models
     |--------------------------------------------------------------------------
     |
-    | Here you may specify a mapping of model aliases to their fully qualified
-    | class names. This is useful when you want to use short names in your
-    | routes or when your models are located outside of App\Models.
+    | A mapping of model aliases to their fully qualified class names.
+    | In production, only registered models can be sorted.
+    | In other environments, App\Models\{Name} is also resolved automatically.
     |
     | Example:
     | 'models' => [
