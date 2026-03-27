@@ -18,6 +18,8 @@ class SortableServiceProvider extends ServiceProvider
             return "data-sortable-update-url=\"<?php echo e({$expression}->sortableUrl()); ?>\"";
         });
 
+        Blade::anonymousComponentPath(__DIR__.'/../resources/views/components', 'sortable');
+
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__ . '/../config/sortable.php' => config_path('sortable.php'),

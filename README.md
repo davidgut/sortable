@@ -50,20 +50,44 @@ SortableList.start();
 Mark up your list:
 
 ```html
+<x-sortable::list>
+    @foreach($posts as $post)
+        <x-sortable::item :model="$post">
+            <x-sortable::drag />
+            {{ $post->title }}
+        </x-sortable::item>
+    @endforeach
+</x-sortable::list>
+```
+
+This produces:
+
+```html
+<ul data-sortable>
+    <li data-sortable-update-url="/sortable/Post/1">
+        <span class="drag">⠿</span>
+        My First Post
+    </li>
+    ...
+</ul>
+```
+
+All three components accept `as` to change the rendered element (defaults: `ul`, `li`, `span`), and forward any extra attributes.
+
+#### Without Components
+
+If you prefer plain HTML, use the `@sortableUrl` directive or the `->sortableUrl()` method:
+
+```html
 <ul data-sortable>
     @foreach($posts as $post)
         <li @sortableUrl($post)>
-            <span class="drag">:::</span>
+            <span class="drag">⠿</span>
             {{ $post->title }}
         </li>
     @endforeach
 </ul>
 ```
-
-> The `@sortableUrl` directive outputs the full `data-sortable-update-url="..."` attribute.  
-> You can also write it manually if you prefer: `data-sortable-update-url="{{ $post->sortableUrl() }}"`.
-
-
 Make sure you have a `<meta name="csrf-token">` tag in your layout — the JS reads it for requests.
 
 Done. Your list is now sortable.
