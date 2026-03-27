@@ -72,7 +72,18 @@ This produces:
 </ul>
 ```
 
-All three components accept `as` to change the rendered element (defaults: `ul`, `li`, `span`), and forward any extra attributes.
+All three components accept `as` to change the rendered element (defaults: `ul`, `li`, `span`), and forward any extra attributes:
+
+```html
+<x-sortable::list as="div" class="grid gap-2">
+    @foreach($posts as $post)
+        <x-sortable::item as="div" :model="$post" class="card">
+            <x-sortable::drag as="button" class="cursor-grab">☰</x-sortable::drag>
+            {{ $post->title }}
+        </x-sortable::item>
+    @endforeach
+</x-sortable::list>
+```
 
 #### Without Components
 
